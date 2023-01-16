@@ -56,9 +56,111 @@
 <script>
 	$(document).ready(function() {
 		$('#loginIdCheckBtn').on('click', function() {
+			$('#idCheckLength').addClass('d-none');
+			$('#idCheckDuplicated').addClass('d-none');
+			$('#idCheckOk').addClass('d-none');
 			//alert("테스트용");
 			let loginId = $('input[name=loginId]').val().trim();
-			alert(loginId);
+			//alert(loginId);
+			
+			if (loginId.length < 4) {
+				$('#idCheckLength').removeClass('d-none'); // 경고문구 노출
+				return;
+			}
+			
+			$.ajax({
+				// request
+				type:"GET"
+				, url:"/user/is_duplicated_id"
+				, data:{"loginId":loginId}
+				
+				// response
+				, success:function(data){
+					if(data.code == 1) {
+						
+						if (data.result) {
+							$('#idCheckDuplicated').removeClass('d-none');
+						} else {
+							$('#idCheckOk').removeClass('d-none');
+						}
+					} else {
+						alert(data.errorMessage);
+					}
+				}
+				, error:function(e) {
+					alert("중복 확인을 실패하였습니다." + e);
+				}
+			});
+		});
+		
+		// 회원가입
+		$('#signUpForm').on('submit', function(e) {
+			e.preventDefault(); // 서브밋 중단 구문 - 눌러도 submit 되지 않음
+			
+			// 로그인 ,비밀번호, 등등 비어있지 않은지 validation 추가
+			/* loginId
+			password
+			confirmPassword
+			name
+			email */
+			let loginId = $('#loginId').val().trim();
+			let password = $('#password').val().trim();
+			let confirmPassword = $('#confirmPassword').val().trim();
+			let name = $('#name').val().trim()
+			let email = $('#email').val().trim();
+			
+			if (loginId == "") {
+				alert("아이디를 입력해주세요");
+				return false;
+			}
+			if(password == "") {
+				alert("비밀번호를 입력해주세요");
+				return false;
+			}
+			if(confirmPassword == "") {
+				alert("비밀번호를 입력해주세요");
+				return false;
+			}
+			if (password != confirmPassword) {
+				alert("비밀번호가 일치하지 않습니다.");
+				return false;
+			}
+			if(name == "") {
+				alert("이름을 입력해주세요");
+				return false;
+			}
+			if(email == "") {
+				alert("이메일을 입력해주세요");
+				return false;
+			}
+			
+			// 아이디 중복확인 완료 됐는지 확인 -> idCheckOk d-none을 가지고 있으면 확인하라는 alert 띄워야 함
+			if($('#idCheckOk').hasClass('d-none')) {
+				alert("아이디 중복확인을 다시 해주세요");
+				return false;
+			}
+			
+			// 서버로 보내는 첫 번째 방법
+			// 1) submit을 동작시킨다 
+			// $(this)[0].submit(); // 첫번째 폼태그를 작동시킨다는 뜻이다. - sumit이기 때문에 화면이 넘어간다. view 페이지 이동
+			
+			// 2) ajax
+			let url = $(this).attr('action');
+			let params = $(this).serialize(); // name으로 파라미터 구성
+			
+			//alert(params);
+			console.log(params);
+			
+			$.post(url, params)
+			.done(function(data) {
+				if (data.code == 1) {
+					alert("가입을 환영합니다 ! 로그인 해주세요");
+					location.href = "/user/sign_in_view";
+				} else {
+					alert(data.errorMessage);
+				}
+				
+			});
 		});
 	});
 </script>
