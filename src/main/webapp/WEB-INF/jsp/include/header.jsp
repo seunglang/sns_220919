@@ -1,14 +1,37 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<div class="header-box d-flex justify-content-between align-items-center">
-	<%-- logo --%>
-	<div>
-		<h1 class="font-weight-bold">MEMO 게시판</h1>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<div class="header d-flex justify-content-between">
+	<%-- logo를 y축으로 .header의 가운데에 위치 --%>
+	<div class="logo d-flex align-items-center">
+		<h1 class="text-white ml-3"><a href="/timeline/timeline_view" class="text-white">Marondalgram</a></h1>
 	</div>
-
-	<%-- 로그인 정보 --%>
-	<div class="mr-4">
-		<span>OO님 안녕하세요</span>
-		<a href="/user/sign_out" class="ml-3 font-weight-bold">로그아웃</a>
+	<div class="login-info d-flex align-items-end mb-3 mr-5">
+		<%-- 로그인 정보 있을 때만 노출 --%>
+		<c:if test="${not empty userName}">
+			<span class="text-white">${userName}님 안녕하세요</span>
+			<a href="/user/sign_out" class="ml-2 text-white font-weight-bold">로그아웃</a>
+		</c:if>
+		<%-- 비로그인 시 로그인 노출 --%>
+		<c:if test="${empty userName}">
+			<a href="/user/sign_in_view" class="text-white font-weight-bold">로그인</a>
+		</c:if>
 	</div>
 </div>
+
+
+
+<%-- <div class="header-box d-flex justify-content-between align-items-center">
+	logo
+	<div>
+		<h1 class="font-weight-bold">SNS 게시판</h1>
+	</div>
+
+	로그인 정보 : 로그인이 되었을 때만 노출
+	<c:if test="${not empty userId}">
+	<div class="mr-4">
+		<span>${userName}님 안녕하세요</span>
+		<a href="/user/sign_out" class="ml-3 font-weight-bold">로그아웃</a>
+	</div>
+	</c:if>
+</div> --%>

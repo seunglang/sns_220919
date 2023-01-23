@@ -17,13 +17,13 @@
 </head>
 <body>
 	<div id="wrap">
-		<header class="bg-warning">
+		<header class="bg-success">
 			<jsp:include page="../include/header.jsp" />
 		</header>
 		<section class="contents">
 			<jsp:include page="../${viewName}.jsp" />
 		</section>
-		<footer class="bg-warning">
+		<footer class="bg-success">
 			<jsp:include page="../include/footer.jsp" />
 		</footer>
 	</div>

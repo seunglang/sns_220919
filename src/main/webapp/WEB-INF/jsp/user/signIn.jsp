@@ -27,3 +27,76 @@
 		</form>
 	</div>
 </div>
+
+<script>
+$(document).ready(function() {
+	// 로그인 서브밋
+	$('#loginForm').submit(function(e) {
+		e.preventDefault(); // submit 자동 수행 중단
+		
+		var loginId = $('input[name=loginId]').val().trim();
+		if (loginId == '') {
+			alert("아이디를 입력해주세요.");
+			return;
+		}
+		
+		var password = $('input[name=password]').val();
+		if (password == '') {
+			alert("비밀번호를 입력해주세요.");
+			return;
+		}
+		
+		// AJAX로 서브밋
+		var url = $(this).attr("action");
+		var params = $(this).serialize(); // form의 name 속성으로 data를 구성한다.
+		console.log(params);
+		
+		$.post(url, params)
+		.done(function(data) {
+			if (data.code == 1) {
+				location.href="/timeline/timeline_view"; 
+			} else {
+				alert("로그인에 실패했습니다. 다시 시도해주세요.");
+			}
+		}); 
+	});
+});
+</script>
+
+<!-- <script>
+	$(document).ready(function() {
+		$('#loginForm').on('submit', function(e) {
+			// submit 안되게 해야 한다.
+			e.preventDefault();
+			let loginId = $('input[name=loginId]').val().trim();
+			let password = $('#password').val();
+			//console.log(loginId);
+			//console.log(password);
+			
+			if (loginId == "") {
+				alert("아이디를 입력해주세요.");
+				return false;
+			}
+			if (password == "") {
+				alert("비밀번호를 입력해주세요.");
+				return false;
+			}
+			
+			let url = $(this).attr('action'); // 내가 만든 폼 태그의 action 값이 url 변수에 들어간다.
+			let params = $(this).serialize(); // 키와 벨류, 즉 쿼리스트링의 request 함수처럼 구성이 된다.
+			//console.log(url);
+			//console.log(params);
+			
+			// ajax 시작
+			
+			$.post(url, params) // request
+			.done(function(data) { // response
+				if (data.code == 1) {
+					document.location.href = "/timeline/timeline_view"; // 글 목록으로 이동하는 페이지 주소
+				} else {
+					alert(data.errorMessage);
+				}
+			});
+		});
+	});
+</script> -->

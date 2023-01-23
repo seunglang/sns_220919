@@ -17,21 +17,20 @@ public class TestController {
 	@Autowired
 	private PostDAO postDAO;
 	
-	@GetMapping("/test1")
 	@ResponseBody
+	@GetMapping("/test1")
 	public String test1() {
-		return "Hello World";
+		return "테스트1";
 	}
 	
+	@ResponseBody
 	@GetMapping("/test2")
-	@ResponseBody()
 	public Map<String, Object> test2() {
-		Map<String, Object> result = new HashMap<>();
-		result.put("1", 111);
-		result.put("2", 222);
-		result.put("3", 333);
-		
-		return result;
+		Map<String, Object> map = new HashMap<>();
+		map.put("test1", 111);
+		map.put("test2", 222);
+		map.put("test3", 333);
+		return map;
 	}
 	
 	@GetMapping("/test3")
@@ -39,9 +38,9 @@ public class TestController {
 		return "test/test";
 	}
 	
+	@ResponseBody
 	@GetMapping("/test4")
-	@ResponseBody()
 	public List<Map<String, Object>> test4() {
-		return postDAO.selectListsTest();
+		return postDAO.selectPostListTest();
 	}
 }
