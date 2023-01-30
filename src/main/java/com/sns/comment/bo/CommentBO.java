@@ -57,6 +57,9 @@ public class CommentBO {
 		return commentViewList;
 	}
 	
+	public void deleteCommentsByPostId(int postId) {
+		commentDAO.deleteCommentsByPostId(postId);
+	}
 
 //	public void createComment(int userId, int postId, String content) {
 //		commentDAO.insertComment(userId, postId, content);

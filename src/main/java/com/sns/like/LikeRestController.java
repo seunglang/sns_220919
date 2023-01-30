@@ -41,6 +41,7 @@ public class LikeRestController {
 		
 		int existLikeRow = likeBO.existLikeByUserIdPostId(userId, postId);
 		
+		// 로직 자체가 컨트롤러에 있으면 안되고 아래에 조건식을 likeBO에서 만들어야 한다.
 		if (existLikeRow == 0) {
 			likeBO.insertLike(userId, postId);
 			result.put("code", true);

@@ -33,12 +33,21 @@
 			<div class="card border rounded mt-3">
 				<%-- 글쓴이, 더보기(삭제) --%>
 				<div class="p-2 d-flex justify-content-between">
-					<span class="font-weight-bold">${card.user.loginId}</span>
+					<span class="font-weight-bold">
+						${card.user.loginId}
+						<!-- if문으로 팔로우를 수락했다면 그 즉시 이 버튼 대신 체크했다는 아이콘으로 바꿔주자 - 토글 -->
+						<a href="#" class="follow-btn" data-user-id="${card.user.id}">
+							<img src="https://cdn-icons-png.flaticon.com/512/3756/3756602.png" width="30px" alt="followPic">
+						</a>
+					</span>
 					
-					<%-- 더보기 --%>
-					<a href="#" class="more-btn">
+					
+					<%-- 더보기 - 내가 쓴 글일때만 노출 --%>
+					<c:if test="${userId eq card.user.id}">
+					<a href="#" class="more-btn" data-toggle="modal" data-target="#modal" data-post-id="${card.post.id}">
 						<img src="https://www.iconninja.com/files/860/824/939/more-icon.png" width="30">
 					</a>
+					</c:if>
 				</div>
 				
 				<%-- 카드 이미지 --%>
@@ -49,9 +58,9 @@
 				<%-- 좋아요 --%>
 				<div class="card-like m-3">
 					
-					<a href="" class="like-btn" data-post-id="${card.post.id}" data-user-id="${card.user.id}">
+					<a href="" class="like-btn" data-post-id="${card.post.id}" data-user-id="${userId}">
 						<c:choose>
-							<c:when test="${card.filledLike == true}">
+							<c:when test="${card.filledLike eq true}">
 								<img src="https://www.iconninja.com/files/379/449/110/heart-icon.png" id="filledHeart" class="" width="18" height="18" alt="empty heart">
 							</c:when>
 							<c:when test="${card.filledLike == false}">
@@ -61,6 +70,20 @@
 						좋아요 ${card.likeCount}개
 					</a>
 					
+					<!-- 선생님 코드 -->
+					<!-- 좋아요가 되어있을 때 -->
+					<%-- <a href="" class="like-btn" data-post-id="${card.post.id}" data-user-id="${card.user.id}">
+						<c:if test="${card.filledLike eq true}">
+							<img src="https://www.iconninja.com/files/379/449/110/heart-icon.png" id="filledHeart" class="" width="18" height="18" alt="empty heart">
+						</c:if>
+					</a> --%>
+					<!-- 좋아요가 해제되어 있을 때 -->
+					<%-- <a href="" class="like-btn" data-post-id="${card.post.id}" data-user-id="${card.user.id}">
+						<c:if test="${card.filledLike eq false}">
+							<img src="https://www.iconninja.com/files/214/518/441/heart-icon.png" id="unfilledHeart" class="" width="18" height="18" alt="empty heart">
+						</c:if>
+					</a> --%>
+					<%-- 좋아요 ${card.likeCount}개 --%>
 				</div>
 				
 				<%-- 글 --%>
@@ -106,6 +129,29 @@
 		<%--// 타임라인 영역 끝  --%>
 	</div>
 </div>
+
+
+<!-- 모달 -->
+
+<!-- Modal -->
+<div class="modal fade" id="modal""> <!--  data-post-id="" -->
+	<%-- modal-sm : 작은 모달 창 --%>
+	<%-- modal-dialog-centered : 수직으로 가운데 정렬 --%>
+  	<div class="modal-dialog modal-sm modal-dialog-centered"> <!-- modal-dialog-centered 모달창을 가운데로 뜨게 하는 코드 -->
+    	<div class="modal-content text-center">
+      		<div class="py-3 border-bottom">
+      			<a href="#" id="deletePostBtn">삭제하기</a>
+      		</div>
+      		<div class="py-3">
+      		<%-- data-dismiss="modal" 을 추가하면 모달창이 닫힘 --%>
+      			<a href="#" data-dismiss="modal">취소하기</a> 
+      		</div>
+    	</div>
+ 	 </div>
+</div>
+
+
+
 
 <script>
 	$(document).ready(function() {
@@ -221,19 +267,27 @@
 		
 		// 좋아요 누르기
 		$('.like-btn').on('click', function(e) {
+			e.preventDefault();
+			
 			let postId = $(this).data('post-id');
-			//let userId = $(this).data('user-id');
-			//alert(postId);
-
+			let userId = $(this).data('user-id');
+			//alert(userId);
+			
+			// 로그인 확인 여부 체크하자
+			if (userId == '') {
+				alert("로그인을 해주세요");
+				return;
+			}
 			
 			$.ajax({
 				
 				type:'GET'
 				, url:'/like/' + postId
-				, data:{"postId":postId}
+				//, data:{"postId":postId}
+			
 				, success:function(data) {
 					if (data.code) { // 좋아요가 insert 됐을 때
-						document.location.reload();
+						document.location.reload(); // timetime 컨트롤러를 다시 들어와서 실행시키겠다는 뜻
 					} else { // 좋아요가 delete되거나 누르지 않은 상태일 때
 						if (data.code == 500) {
 							alert(data.result);
@@ -249,5 +303,71 @@
 			});
 			
 		});
+		
+		// 더보기 버튼(...) 클릭 (글 삭제를 위해)
+		$('.more-btn').on('click', function(e) {
+			e.preventDefault(); // a태그에 위로 올라가는 현상 방지하기 위한 e.preventDefault
+			let postId = $(this).data("post-id"); // getting
+			//alert(postId);
+			
+			$('#modal').data('post-id', postId) // setting 모달 태그에 data-post-id를 심어 넣어줌
+			
+		});
+		
+		// 모달 안에 있는 삭제하기 버튼 클릭
+		$('#modal #deletePostBtn').on('click', function(e) {
+			e.preventDefault();
+			let postId = $('#modal').data('post-id'); // 동적으로 꺼내오는 작업
+			//alert(postId);
+			
+			// ajax로 글 삭제하기 api 생성
+			
+			$.ajax({
+				// request
+				type:"DELETE"
+				, url:"/post/delete"
+				, data:{"postId":postId}
+				
+				// response
+				, success:function(data) {
+					if (data.code == 200) {
+						alert(data.result);
+						location.href = "/timeline/timeline_view";
+					} else {
+						alert(data.errorMessage);
+					}
+				}
+				
+				, error:function(e) {
+					alert("게시글을 삭제하는데 실패했습니다.");
+				}
+				
+			});
+		});
+		
+		// 팔로우 기능
+		/* $('.follow-btn').on('click', function() {
+			let userId = $(this).data('user-id');
+			//alert(userId);
+			
+			$.ajax({
+				// request
+				type:"GET"
+				, url:"/follow/" + userId
+				
+				// response
+				, success:function(data) {
+					if (data.code == 200) {
+						alert(data.result);
+						location.reload();
+					} else {
+						alert(errorMessage);
+					}
+				}
+				, error:function(e) {
+					alert("팔로우 실패했습니다.");
+				}
+			});
+		}); */
 	});
 </script>

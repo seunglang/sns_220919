@@ -80,6 +80,12 @@ public class TimelineBO {
 				cardView.setFilledLike(false);
 			}
 			
+			// 선생님 코드
+			//cardView.setFilledLike(likeBO.existLike(post.getId(), userId));
+			
+			// 선생님 코드
+			//cardView.setLikeCount(likeBO.getLikeCountByPostId(post.getId())); - 이렇게 하면 한줄로도 반복문 없이 개수를 가져올 수 있다.
+			
 			
 			// 카드 리스트에 채우기
 			cardViewList.add(cardView); // 1:1 맵핑으로 인해 carViewList에 하나씩 채워진다.

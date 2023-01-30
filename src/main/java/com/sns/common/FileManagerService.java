@@ -6,14 +6,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 @Component // logic은 들어가는데 bo, dao, controller 에 속하지 않을 때 쓰는 구문 - bo와 dao, controller의 부모격이다. 그렇기 때문에 common에 저장됨 - 일반적인 스프링빈
 public class FileManagerService {
+	
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	// 실제 이미지가 저장될 경로(서버)
 		// 상수를 저장할땐 대문자로 써주면 된다.
-		public static final String FILE_UPLOAD_PATH = "D:\\spring_project_6\\memo\\workspace\\images/"; // 마지막엔 꼭 슬래시를 넣어줘야함
+		public static final String FILE_UPLOAD_PATH = "D:\\spring_project_6\\sns\\workspace\\images/"; // 마지막엔 꼭 슬래시를 넣어줘야함
 		
 		// input: MultiPartFile이 통째로 넘어옴, userLoginId
 		// output: image Path
@@ -43,5 +48,30 @@ public class FileManagerService {
 			// 파일 업로드 성공했으면 이미지 url path를 리턴한다.
 			// http://localhost:8080/images/aaaa_16536/sun.png 이런식의 path를 만들 것이다.
 			return "/images/" + directoryName + file.getOriginalFilename(); // 나중에 영문자로 수정해주면 여기도 수정해주면 된다.
+		}
+		
+		public void deleteFile(String imagePath) { // imagePath: /images/aaaa_16536/sun.png 이런식으로 넘어올 것
+			//     \\images/        imagePath에 있는 겹치는 /images/ 이 부분 제거해줘야 함
+			Path path = Paths.get(FILE_UPLOAD_PATH + imagePath.replace("/images/", ""));
+			if(Files.exists(path)) {
+				// 이미지 삭제
+				try {
+					Files.delete(path);
+				} catch (IOException e) {
+					//e.printStackTrace();
+					logger.error("[이미지 삭제] 이미지 삭제 실패. imagePath:{}", imagePath);
+				}
+				
+				// 디렉토피(폴더) 삭제
+				path = path.getParent();
+				if (Files.exists(path)) {
+					try {
+						Files.delete(path);
+					} catch (IOException e) {
+						//e.printStackTrace();
+						logger.error("[이미지 삭제] 디렉토리 삭제 실패. imagePath:{}", imagePath);
+					}
+				}
+			}
 		}
 }

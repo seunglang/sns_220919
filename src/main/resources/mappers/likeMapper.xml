@@ -39,6 +39,14 @@
  			`postId` = #{postId}
  	</delete>
  	
+ 	<delete id="deleteLikeByPostId" parameterType="int">
+ 		DELETE
+ 		FROM
+ 			`like`
+ 		WHERE
+ 			`postId` = #{postId}
+ 	</delete>
+ 	
  	<select id="selectLikeListByPostId" parameterType="int" resultType="com.sns.like.model.Like">
  		SELECT
  			`userId`
@@ -49,4 +57,29 @@
  		WHERE
  			`postId` = #{postId}
  	</select>
+ 	
+ 	<!-- 선생님코드 - 비슷한 구문 합치는 쿼리-->
+ 	<select id="selectLikeCountByPostIdOrUserId" parameterType="int" resultType="int">
+ 		SELECT
+ 			COUNT(*)
+ 		FROM
+ 			`like`
+ 		WHERE
+ 			`postId` = #{postId}
+ 			<if test="userId != null"> <!-- mybatis의 DTD가 제공해주는 함수 -->
+ 			AND
+ 			`userId` = #{userId}
+ 			</if>
+ 	</select>
+ 	
+ 	
+ 	<!-- 선생님 코드 -->
+ 	<!-- <select id="selectLikeCountByPostId" parameterType="int" resultType="int">
+ 		SELECT
+ 			COUNT(*)
+ 		FROM
+ 			`like`
+ 		WHERE
+ 			`postId` = #{postId}
+ 	</select> -->
  </mapper>

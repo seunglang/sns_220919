@@ -36,6 +36,11 @@ public class LikeBO {
 		likeDAO.deleteLikeByUserIdPostId(userId, postId);
 	}
 	
+	// 좋아요 postId로만 삭제하기
+	public void deleteLikeByPostId(int postId) {
+		likeDAO.deleteLikeByPostId(postId);
+	}
+	
 	// 좋아요들 리스트 가져오기
 	public List<Like> getLikeListByPostId(int postId) {
 		return likeDAO.selectLikeListByPostId(postId);
@@ -68,4 +73,21 @@ public class LikeBO {
 		// 결과물 리턴
 		return likeViewList;
 	}
+	
+
+	// 쿼리 비슷한거 한번에 가져오기
+	// 선생님 코드 - 이 구문에서 비로그인 처리도 해준다.
+	public boolean existLike(int postId, Integer userId) {
+		if (userId == null) { // 비로그인
+			return false; // return false로 채워지지 않은 하트로 넘긴다.
+		}
+		
+		return likeDAO.selectLikeCountByPostIdOrUserId(postId, userId) > 0 ? true : false; // 로그인 - boolean 리턴값해줘야 하기 때문에 삼항연산자
+	}
+	
+	// 선생님 코드 - 좋아요 개수 가져오기
+	public int getLikeCountByPostId(int postId) {
+		return likeDAO.selectLikeCountByPostIdOrUserId(postId, null);
+	}
+	
 }
